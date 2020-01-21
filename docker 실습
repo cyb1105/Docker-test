@@ -1,0 +1,71 @@
+- 초기 설정
+compose.yml이 있는 곳에서 docker-compose up 실행
+
+build 
+tododb가서 이미지 빌드 (도커파일이 있는곳)
+docker build -t 이미지 이름 :latest .
+docker build -t  localhost:5000/ch04/tododb:latest .
+
+레지스트리에 이미지 올리기 
+docker push localhost:5000/ch04/tododb:latest
+
+network create
+docker exec -it manager docker network create --driver=overlay --attachable todoapp
+network check
+docker network ls
+
+이미지 배포 
+docker stack deploy -c /stack/todo-mysql.yml todo_mysql
+배포한 이미지 체크
+docker stack services todo_mysql
+
+
+- MySQL 컨테이너 확인 및 초기 데이터 투입
+docker service ps todo_mysql_master
+
+$docker exec -it worker03 sh
+$docker ps
+$docker exec -it e1119ceafacc bash
+init-data.sh
+mysql -uroot -p tododb
+pw : gihyo
+select * from todo
+
+- API 서비스 구축
+todoapi 도커파일이 있는 디렉토리에서 이미지 빌드
+docker image build -t localhost:5000/ch04/todoapi:latest .
+
+레지스트리에 이미지 올리기
+docker push localhost:5000/ch04/todoapi:latest
+
+스택에 이미지 배포
+docker exec -it manager docker stack deploy -c /stack/todo-app.yml todo_app
+
+-nginx구축
+todonginx 도커파일이 있는 디렉토리에서 이미지 빌드
+$docker build -t localhost:5000/ch04/nginx:latest . 
+$docker image push localhost:5000/ch04/nginx:latest
+$docker exec -it manager docker stack deploy -c /stack/todo-app.yml todo_app //스택에 재배포
+
+apt-get update
+apt-get install -y net-tools
+apt-get install curl
+netstat -ntpl
+
+curl -XGET http://localhost:8000/todo?status=DONE //todo_app_api.2.와 연결 확인
+
+
+- todoweb
+ docker image build -t ch04/todoweb:latest . //이미지 등록
+ docker image tag ch04/todoweb:latest localhost:5000/ch04/todoweb:latest//태그
+ docker image push localhost:5000/ch04/todoweb:latest //레지스트리 등록
+
+-정적파일 다루는법 (따라하기)
+(todonginx)cp .\etc\nginx\conf.d\public.conf.tmpl .\etc\nginx\conf.d\nuxt.conf.tmpl
+(todonginx)docker image build -f Dockerfile-nuxt -t ch04/nginx-nuxt:latest .
+(todonginx)docker image tag ch04/nginx-nuxt:latest localhost:5000/ch04/nginx-nuxt:latest
+(todonginx)docker image push localhost:5000/ch04/nginx-nuxt:latest
+
+
+docker stack deploy -c /stack/todo-frontend.yml  todo_frontend //프론트엔드로 스택 배포
+docker stack deploy -c /stack/todo-ingress.yml  todo_ingress

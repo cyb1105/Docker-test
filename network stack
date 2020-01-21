@@ -1,0 +1,9 @@
+1. 네트워크 생성
+docker network create --driver=overlay --attachable ybapp
+
+2. stack 배포
+docker stack deploy -c /stack/yb-mysql.yml mysql
+docker stack deploy -c /stack/yb-app.yml app
+docker stack deploy -c /stack/yb-frontend.yml frontend
+docker stack deploy -c /stack/yb-ingress.yml ingress
+

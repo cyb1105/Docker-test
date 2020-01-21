@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  ybmaster:
+    image: registry:5000/cyb/tododb:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role != manager]
+    environment:
+      MYSQL_ROOT_PASSWORD: cyb 
+      MYSQL_DATABASE: tododb 
+      MYSQL_USER: cyb 
+      MYSQL_PASSWORD: cyb 
+      MYSQL_MASTER: "true"
+    networks:
+      - ybapp
+
+  ybslave:
+    image: registry:5000/cyb/tododb:latest
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.role != manager]
+    depends_on:
+      - ybmaster
+    environment:
+      MYSQL_MASTER_HOST: ybmaster
+      MYSQL_ROOT_PASSWORD: cyb 
+      MYSQL_DATABASE: tododb 
+      MYSQL_USER: cyb 
+      MYSQL_PASSWORD: cyb 
+      MYSQL_ROOT_PASSWORD: cyb 
+      MYSQL_REPL_USER: repl 
+      MYSQL_REPL_PASSWORD: cyb 
+    networks:
+      - ybapp
+
+networks:
+  ybapp:
+    external: true

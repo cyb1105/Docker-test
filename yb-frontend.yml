@@ -1,0 +1,47 @@
+version: "3"
+services:
+  ybnginx:
+    image: registry:5000/cyb/nginx-nuxt:latest 
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.role != manager]
+    depends_on:
+      - ybweb
+    environment:
+      SERVICE_PORTS: 80
+      WORKER_PROCESSES: 2
+      WORKER_CONNECTIONS: 1024
+      KEEPALIVE_TIMEOUT: 65
+      GZIP: "on"
+      BACKEND_HOST: yb_frontend_web:3000
+      BACKEND_MAX_FAILES: 3
+      BACKEND_FAIL_TIMEOUT: 10s
+      SERVER_PORT: 80
+      SERVER_NAME: localhost
+      LOG_STDOUT: "true"
+    networks:
+      - ybapp
+    volumes:
+      - assets:/var/www/_nuxt
+
+  ybweb:
+    image: registry:5000/cyb/todoweb:latest
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.role != manager]
+    environment:
+      TODO_API_URL: http://yb_app_nginx:8000
+    networks:
+      - ybapp
+    volumes:
+      - assets:/todoweb/.nuxt/dist
+
+networks:
+  ybapp:
+    external: true
+
+volumes:
+  assets:
+    driver: local

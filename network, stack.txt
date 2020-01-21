@@ -1,0 +1,9 @@
+1. 匙飘况农 积己
+docker network create --driver=overlay --attachable ybapp
+
+2. stack 硅器
+docker stack deploy -c /stack/yb-mysql.yml mysql
+docker stack deploy -c /stack/yb-app.yml app
+docker stack deploy -c /stack/yb-frontend.yml frontend
+docker stack deploy -c /stack/yb-ingress.yml ingress
+
