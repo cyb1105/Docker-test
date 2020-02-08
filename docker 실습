@@ -2,7 +2,7 @@
 compose.yml이 있는 곳에서 docker-compose up 실행
 
 build 
-tododb가서 이미지 빌드 (도커파일이 있는곳)
+tododb가서 이미지 빌드 (docker파일이 있는곳)
 docker build -t 이미지 이름 :latest .
 docker build -t  localhost:5000/ch04/tododb:latest .
 
@@ -14,7 +14,7 @@ docker exec -it manager docker network create --driver=overlay --attachable todo
 network check
 docker network ls
 
-이미지 배포 
+image 배포 
 docker stack deploy -c /stack/todo-mysql.yml todo_mysql
 배포한 이미지 체크
 docker stack services todo_mysql
